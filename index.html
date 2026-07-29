@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="verAcist">
+  <meta name="description" content="Solicitações de assistência e visitas técnicas da Veraci Design">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>verAcist — Veraci Design</title>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><div class="brand-mark">VD</div><div><span class="eyebrow">VERACI DESIGN</span><h1>verAcist</h1></div></div>
+  <button id="installBtn" class="ghost hidden" type="button">Instalar</button>
+</header>
+<nav class="tabs" aria-label="Navegação principal">
+  <button class="tab active" data-view="requestView">Solicitação</button>
+  <button class="tab" data-view="visitsView">Visitas <span id="visitCount" class="count">0</span></button>
+  <button class="tab" data-view="historyView">Histórico</button>
+</nav>
+<main>
+<section id="requestView" class="view active">
+<form id="requestForm" novalidate>
+  <section class="card intro-card">
+    <div><span class="eyebrow dark">ORDEM DE SERVIÇO</span><h2>Solicitação de Assistência Técnica</h2><p>Cadastro prévio para planejamento e execução do atendimento em campo.</p></div>
+    <div class="number-box"><span>Nº da solicitação</span><strong id="requestNumber"></strong><small id="requestState">Novo rascunho</small></div>
+  </section>
+
+  <section class="card">
+    <div class="card-title"><h2>Identificação</h2><span class="section-number">01</span></div>
+    <div class="grid two">
+      <label>Data da solicitação<input id="requestDate" type="date"></label>
+      <label>Solicitado por<input id="requestedBy" type="text" placeholder="Nome do solicitante"></label>
+      <label>Tipo de atendimento
+        <select id="serviceType"><option value="">Selecione</option><option>Garantia</option><option>Assistência técnica</option><option>Vistoria</option><option>Outro</option></select>
+      </label>
+      <label>Preenchido por<input id="filledBy" type="text" placeholder="Responsável pelo cadastro"></label>
+    </div>
+    <h3 class="subheading">Classificação da ocorrência</h3>
+    <div class="choice-grid">
+      <label><input type="radio" name="mainType" value="Assistência Técnica - Pós Montagem" checked><span>Assistência Técnica<small>Pós-montagem</small></span></label>
+      <label><input type="radio" name="mainType" value="Assistência Técnica - Em Montagem"><span>Assistência Técnica<small>Em montagem</small></span></label>
+      <label><input type="radio" name="mainType" value="Vistoria Pós Montagem"><span>Vistoria<small>Pós-montagem</small></span></label>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-title"><h2>Dados do cliente</h2><span class="section-number">02</span></div>
+    <div class="grid two">
+      <label>Nome do cliente<input id="clientName" type="text" placeholder="Cliente / razão social"></label>
+      <label>Contrato<input id="contract" type="text" placeholder="Número do contrato"></label>
+      <label>Telefone<input id="phone" type="tel" inputmode="tel" placeholder="(00) 00000-0000"></label>
+      <label class="span-2">Endereço completo da instalação<input id="address" type="text" placeholder="Rua, número, complemento e bairro"></label>
+      <label>Cidade<input id="city" type="text"></label>
+      <label>UF<input id="uf" type="text" maxlength="2" placeholder="SP"></label>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-title wrap"><div><h2>Ocorrências</h2><p class="hint">Cada ocorrência será copiada para a visita vinculada.</p></div><button id="addOccurrence" class="secondary" type="button">+ Adicionar ocorrência</button></div>
+    <div id="occurrences"></div>
+  </section>
+
+  <section class="card">
+    <div class="card-title"><h2>Agendamento</h2><span class="section-number">04</span></div>
+    <div class="grid three">
+      <label>Data da visita ao cliente<input id="visitDate" type="date"></label>
+      <label>Horário de chegada<input id="scheduledTime" type="time"></label>
+      <label>Técnico responsável<input id="technician" type="text" placeholder="Nome do técnico"></label>
+    </div>
+    <div class="automation-note"><strong>Vinculação automática</strong><span>Ao salvar com uma data de agendamento, o sistema cria ou atualiza uma única visita técnica vinculada.</span></div>
+  </section>
+
+  <section class="card">
+    <div class="card-title"><h2>Status da solicitação</h2><span class="section-number">05</span></div>
+    <div class="status-grid">
+      <label><input type="radio" name="requestStatus" value="Cadastrada" checked><span>Cadastrada</span></label>
+      <label><input type="radio" name="requestStatus" value="Agendada"><span>Agendada</span></label>
+      <label><input type="radio" name="requestStatus" value="Em atendimento"><span>Em atendimento</span></label>
+      <label><input type="radio" name="requestStatus" value="Reagendada"><span>Reagendada</span></label>
+      <label><input type="radio" name="requestStatus" value="Finalizada"><span>Finalizada</span></label>
+    </div>
+  </section>
+
+  <section class="actions sticky-actions">
+    <button id="saveRequest" class="primary" type="button">Salvar solicitação</button>
+    <button id="saveDraft" class="secondary" type="button">Salvar rascunho</button>
+    <button id="newRequest" class="danger" type="button">Nova / limpar</button>
+  </section>
+</form>
+</section>
+
+<section id="visitsView" class="view">
+  <section class="card intro-card"><div><span class="eyebrow dark">EXECUÇÃO EM CAMPO</span><h2>Visitas Técnicas</h2><p>Demandas criadas automaticamente a partir das solicitações agendadas.</p></div><div class="number-box"><span>Visitas registradas</span><strong id="openVisitCount">0</strong><small>Sincronizadas</small></div></section>
+  <div id="visitsList"></div>
+</section>
+
+<section id="visitFormView" class="view">
+<form id="visitForm" novalidate>
+  <section class="card intro-card">
+    <div><span class="eyebrow dark">RELATÓRIO DE CAMPO</span><h2>Ordem de Visita Técnica</h2><p id="visitSourceText">Cabeçalho preenchido automaticamente pela solicitação.</p></div>
+    <div class="number-box"><span>Nº da visita</span><strong id="visitNumber"></strong><small id="visitStatusBadge">Agendada</small></div>
+  </section>
+  <section class="card inherited">
+    <div class="card-title"><h2>Dados herdados da solicitação</h2><span class="badge">Vinculado</span></div>
+    <div class="grid two">
+      <label>Solicitação de origem<input id="sourceRequestNumber" readonly></label>
+      <label>Data agendada<input id="fieldVisitDate" type="date"></label>
+      <label>Cliente<input id="fieldClientName" readonly></label>
+      <label>Contrato<input id="fieldContract" readonly></label>
+      <label class="span-2">Endereço<input id="fieldAddress" readonly></label>
+      <label>Telefone<input id="fieldPhone" readonly></label>
+      <label>Técnico responsável<input id="fieldTechnician" type="text"></label>
+      <label>Tipo de atendimento<input id="fieldServiceType" readonly></label>
+      <label>Chegada prevista<input id="fieldScheduledTime" type="time"></label>
+    </div>
+  </section>
+  <section class="card">
+    <h2>Deslocamento e horários</h2>
+    <div class="grid two">
+      <label>Origem<input id="origin" type="text"></label><label>Destino<input id="destination" type="text"></label>
+      <label>Horário de saída da origem<input id="originTime" type="time"></label><label>Hora de entrada no destino<input id="arrivalTime" type="time"></label>
+      <label>Hora de saída do destino<input id="departureTime" type="time"></label><label>Horário de retorno à origem<input id="returnTime" type="time"></label>
+      <label>Quilometragem inicial<input id="kmStart" type="number" inputmode="decimal" min="0" step="0.1"></label><label>Quilometragem final<input id="kmEnd" type="number" inputmode="decimal" min="0" step="0.1"></label>
+    </div>
+    <div class="metrics"><div><span>KM percorridos</span><strong id="kmTotal">0,0 km</strong></div><div><span>Tempo de atendimento</span><strong id="serviceDuration">0h 00min</strong></div></div>
+  </section>
+  <section class="card"><div class="card-title"><h2>Ocorrências importadas</h2><span id="importedCount" class="badge"></span></div><div id="importedOccurrences"></div></section>
+  <section class="card">
+    <h2>Resultado técnico</h2>
+    <label>Itens resolvidos / OK<textarea id="resolvedItems" rows="5"></textarea></label>
+    <label>Itens pendentes de materiais<textarea id="materialPending" rows="5"></textarea></label>
+    <label>Itens pendentes — outros<textarea id="otherPending" rows="4"></textarea></label>
+    <label>Observações gerais<textarea id="visitNotes" rows="5"></textarea></label>
+  </section>
+  <section class="card">
+    <h2>Retorno</h2>
+    <div class="segmented"><label><input type="radio" name="returnRequired" value="Não" checked> Não</label><label><input type="radio" name="returnRequired" value="Sim"> Sim</label></div>
+    <div id="returnDetails" class="hidden grid two"><label>Prioridade<select id="priority"><option value="">Selecione</option><option>Alta</option><option>Média</option><option>Baixa</option></select></label><label>Data sugerida<input id="suggestedDate" type="date"></label><label class="span-2">Motivo do retorno<textarea id="returnReason"></textarea></label></div>
+  </section>
+  <section class="card">
+    <h2>Fotos da visita</h2><p class="hint">Até 15 fotos, armazenadas neste aparelho.</p><input id="visitPhotos" type="file" accept="image/*" capture="environment" multiple><div id="visitPhotoPreview" class="photo-grid"></div>
+  </section>
+  <section class="card">
+    <h2>Assinaturas</h2>
+    <div class="signature-block"><div class="signature-head"><span>Assinatura do vistoriador</span><button class="text-btn" data-clear="inspectorSignature" type="button">Limpar</button></div><canvas id="inspectorSignature" class="signature" width="900" height="280"></canvas></div>
+    <div class="signature-block"><div class="signature-head"><span>Assinatura do cliente</span><button class="text-btn" data-clear="clientSignature" type="button">Limpar</button></div><canvas id="clientSignature" class="signature" width="900" height="280"></canvas></div>
+  </section>
+  <section class="actions sticky-actions"><button id="saveVisit" class="primary" type="button">Salvar visita</button><button id="printVisit" class="secondary" type="button">Imprimir / PDF</button><button id="backVisits" class="danger" type="button">Voltar</button></section>
+</form>
+</section>
+
+<section id="historyView" class="view">
+  <section class="card"><div class="card-title wrap"><div><h2>Histórico e vínculos</h2><p class="hint">Consulte e edite solicitações e visitas relacionadas.</p></div><button id="exportBackup" class="secondary" type="button">Exportar backup</button></div><input id="historySearch" type="search" placeholder="Buscar cliente, contrato, solicitação ou visita"><div id="historyList" class="history-list"></div></section>
+</section>
+</main>
+
+<template id="occurrenceTemplate">
+<article class="occurrence"><div class="occ-head"><div><strong></strong><span>Em cadastro</span></div><button class="icon-btn" data-remove type="button">×</button></div><div class="grid two"><label>Ambiente<input data-field="environment" type="text" placeholder="Descreva o ambiente"></label><label>Pedido de fábrica<input data-field="factoryOrder" type="text"></label><label class="span-2">Descrição da ocorrência<textarea data-field="description" rows="4"></textarea></label><label class="span-2">Materiais necessários<textarea data-field="materials" rows="4"></textarea></label><label>Data de finalização<input data-field="finishDate" type="date"></label><label>Observação<input data-field="observation" type="text"></label></div><label class="media-label">Fotografias / vídeos<input data-field="media" type="file" accept="image/*,video/*" capture="environment" multiple></label><div class="media-preview"></div></article>
+</template>
+<script src="app.js"></script>
+</body>
+</html>
